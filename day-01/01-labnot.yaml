@@ -12,7 +12,7 @@ session:
   # One or two sentences. What did I sit down intending to finish?
   # Write this BEFORE starting. If the goal changes mid-session, add an entry
   # to goal_changes rather than editing the original.
-  goal: "Understand what a forward pass is, and start implementing the llama2.c file."
+  goal: "Understand what a tensor is. "
   goal_changes: []            # e.g. "Goal changed to: ..."
 
   # You will come back after a week away and not remember which commit
@@ -27,6 +27,13 @@ session:
   # Resist the urge to write the cleaned-up version.
   what_i_did:
     - ""
+
+  QA:
+  - question: "What is a tensor?"
+    answer: "A 'folder' that stores the data used in the forward pass."
+
+  - question: 
+
 
   # Every measurement, with enough context to reproduce it.
   # Also append each row to results/throughput.csv.
