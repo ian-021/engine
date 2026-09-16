@@ -1,14 +1,3 @@
-/*
-  PLAN (from pseudocode)
-  1. get first 16 bytes of stories15M.bin -> put it into a struct
-  2. header order: hidden_size, intermediate_size, vocab_size, num_hidden_layers
-  3. tensor order: embed, then each of 6 layers
-       q, k, v, o, gate, up, down, input_norm, post_norm
-     then the final norm
-  4. use the header to compute float counts, read the body, walk it in order
-  5. print first few values of each tensor and compare with export.py output
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -46,9 +35,29 @@ int main(void) {
     printf("body bytes: %ld  (expect 60766848)\n", total * 4);
 
     /* TODO: malloc total floats, fread the body, check the return value      */
-    /* TODO: walk the buffer in tensor order with a running pointer           */
-    /* TODO: print embed[42][0..4] and compare with export.py's printed row   */
+
+    float *weights = malloc(total * sizeof(float));
+    if (!weights) { fprintf(stderr, "malloc failed\n"); return 1; }
+
+    if (fread(weights, sizeof(float), total, f) != (size_t) total) {
+        fprintf(stderr, "short read on body\n");
+        return 1;
+    }
+
+    /* embed is the first tensor, so it starts at weights. row r starts r*hidden floats in. */
+    float *embed = weights;
+    printf("embed row 42, first 5: ");
+    for (int i = 0; i < 5; i++) printf("%.6f ", embed[42 * h.hidden_size + i]);
+    printf("\n");
+
+    /* last float in the file = last element of the final norm */
+    printf("last float (final norm[287]): %.6f\n", weights[total - 1]);
+
+
+		
+
 
     fclose(f);
+    free(weights);
     return 0;
 }
