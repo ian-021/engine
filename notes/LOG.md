@@ -1,0 +1,8 @@
+# Log
+
+One line per change that moved a number. Newest last.
+
+| date | milestone | commit | what changed | number |
+|---|---|---|---|---|
+| 2026-09-15 | M0 | 0ef4d5f | export.py writes stories15M weights to flat fp32 file: 16-byte header (hidden, intermediate, vocab, layers) + 56 tensors in fixed order | 15,191,712 params, 60,766,864 bytes |
+| 2026-09-16 | M0 | 66b38ea | run.c reads header, computes tensor sizes, loads body into one buffer, pointer per tensor | 7 spot checks match PyTorch to 6 decimals |
