@@ -53,6 +53,47 @@ int main(void) {
     /* last float in the file = last element of the final norm */
     printf("last float (final norm[287]): %.6f\n", weights[total - 1]);
 
+    /* running-pointer walk, in file order.
+       p starts at the beginning and moves forward as each tensor is claimed.
+       "claim" = write down where p is, then advance p by that tensor's count. */
+    float *wq[6], *wk[6], *wv[6], *wo[6];        /* [hidden, hidden]       */
+    float *w_gate[6], *w_up[6], *w_down[6];       /* [inter,hidden] / [hidden,inter] */
+    float *w_in_norm[6], *w_post_norm[6];         /* [hidden]               */
+    float *w_final_norm;                          /* [hidden]               */
+
+    float *p = weights;
+    embed = p;                  p += embed_floats;
+    for (int L = 0; L < h.num_hidden_layers; L++) {
+        wq[L]          = p;     p += hh_floats;
+        wk[L]          = p;     p += hh_floats;
+        wv[L]          = p;     p += hh_floats;
+        wo[L]          = p;     p += hh_floats;
+        w_gate[L]      = p;     p += ih_floats;
+        w_up[L]        = p;     p += ih_floats;
+        w_down[L]      = p;     p += ih_floats;
+        w_in_norm[L]   = p;     p += h_floats;
+        w_post_norm[L] = p;     p += h_floats;
+    }
+    w_final_norm = p;           p += h_floats;
+    printf("walk ended at %ld floats (expect %ld)\n", (long)(p - weights), total);
+
+    /* spot checks against export.py / PyTorch */
+    printf("layer 0 q row 0, first 5:      ");
+    for (int i = 0; i < 5; i++) printf("%.6f ", wq[0][i]);
+    printf("\n");
+    printf("layer 0 down row 0, first 5:   ");
+    for (int i = 0; i < 5; i++) printf("%.6f ", w_down[0][i]);
+    printf("\n");
+    printf("layer 5 o row 0, first 5:      ");
+    for (int i = 0; i < 5; i++) printf("%.6f ", wo[5][i]);
+    printf("\n");
+    printf("layer 5 post_norm, first 5:    ");
+    for (int i = 0; i < 5; i++) printf("%.6f ", w_post_norm[5][i]);
+    printf("\n");
+    printf("final norm, first 5:           ");
+    for (int i = 0; i < 5; i++) printf("%.6f ", w_final_norm[i]);
+    printf("\n");
+
 
 		
 
